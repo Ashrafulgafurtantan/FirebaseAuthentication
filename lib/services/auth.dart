@@ -1,8 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
-import 'package:flutter/material.dart';
-
-//class AuthService extends ChangeNotifier{
   class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   LocalUser localUser;
@@ -15,19 +12,6 @@ import 'package:flutter/material.dart';
        print(switcher);
       return localUser;
     });
-  }
-
-
-
-bool  isVerifiedChange(){
-    if(localUser==null){
-     switcher=false;
-    }else{
-      switcher = localUser.isVerified;
-    }
-    //notifyListeners();
-
-    return switcher;
   }
 
 
@@ -54,20 +38,23 @@ Future signInWithEmailAndPassword(String email,String password)async{
     try{
       final result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User user = result.user;
-      print("In auth sign in");
-     _auth.currentUser..reload();
-      user = _auth.currentUser;
-      Stream<User> uuu = await _auth.userChanges();
-      print(user.emailVerified);
-      if(user.emailVerified){
+      print("In auth signin Method");
+//     _auth.currentUser..reload();
+//      user = _auth.currentUser;
+   //   Stream<User> uuu = await _auth.userChanges();
+   //   print(user.emailVerified);
 
-        print("yes verified");
 
-        return user;
-      }else{
-        print("Not verified");
-        return null;
-      }
+
+//      if(user.emailVerified){
+//        print("yes verified");
+//        return user;
+//      }else{
+//        print("Not verified");
+//        return null;
+//      }
+
+      return user;
 
     }catch(e){
       print(e.toString());
@@ -77,19 +64,13 @@ Future signInWithEmailAndPassword(String email,String password)async{
   Future signUpWithEmailAndPassword(String email,String pass)async{
 
     try{
-
       final result = await _auth.createUserWithEmailAndPassword(email: email, password: pass);
-      print("In auth signUp");
-      print(result);
-
+      print("In auth signUp function ");
       User user = result.user;
-      final emailResult =  user.sendEmailVerification();
-      if(emailResult!=null){
-        print("email link success");
-      }else{
-        print("email link failure");
-      }
-      return null;
+      await user.sendEmailVerification();
+      return user;
+
+
     }catch(e){
       print(e.toString());
       return null;

@@ -1,6 +1,5 @@
 import 'package:firebase_auth_gorgeous_login/main.dart';
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
-import 'package:firebase_auth_gorgeous_login/services/auth.dart';
 import 'package:firebase_auth_gorgeous_login/style/theme.dart' as Theme;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -43,14 +42,19 @@ class _SignInState extends State<SignIn> {
     final result = await authService.signInWithEmailAndPassword(email, password);//Result = Firebase User
         print("in SignIn");
       if(result==null){
-        print("Just verify your account");
+        print("Email or passwor  e jhamela...");
       }else{
+        if(result.emailVerified){
+          print("Email verified");
 
-        setState(() {
-          authService.localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
-          print(authService.localUser.uid);
-          print(authService.localUser.isVerified);
-        });
+          setState(() {
+            authService.localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
+            print(authService.localUser.uid);
+            print(authService.localUser.isVerified);
+          });
+        }else{
+          print("Not verified");
+        }
       }
   }
 

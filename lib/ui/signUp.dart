@@ -56,14 +56,13 @@ class _SignUpState extends State<SignUp> {
   connectWithFirebaseAuthEmailPassword(String email,String password)async{
     final result = await authService.signUpWithEmailAndPassword(email, password);//Result = Firebase User
     if(result==null){
-      print("main auth e jhamelaa ");
+      print("emal e jhamela ");
     }else{
-      print("Email Password signup");
+      print("In signup class ");
       LocalUser localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
       print(localUser.uid);
     }
   }
-
 
 
   @override

@@ -19,23 +19,15 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  MultiProvider(
-      providers: [
-        Provider<bool>.value(value:authService.isVerifiedChange() ),
-      StreamProvider<LocalUser>.value( value: authService.user,),
-
-      ],
-
+    return  StreamProvider<LocalUser>.value(
+      value: authService.user,
       child: MaterialApp(
         title: 'TheGorgeousLogin',
         debugShowCheckedModeBanner: false,
         theme: new ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: ChangeNotifierProvider(
-          child: Wrapper(),
-          create: (context)=>Switcher(),
-        ),
+        home: Wrapper(),
       ),
     );
   }
