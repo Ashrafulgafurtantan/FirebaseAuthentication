@@ -1,12 +1,9 @@
-import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/services/auth.dart';
 import 'package:firebase_auth_gorgeous_login/ui/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-
-
 AuthService authService=AuthService();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +14,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  StreamProvider<LocalUser>.value(
+    return  StreamProvider<AppGuard>.value(
       value: authService.user,
       child: MaterialApp(
         title: 'TheGorgeousLogin',

@@ -39,6 +39,8 @@ dependencies:
   firebase_messaging: ^7.0.3
   provider: ^4.3.2+2
   fluttertoast: ^7.1.1
+  bottom_navy_bar: ^5.5.0
+  curved_navigation_bar: ^0.3.4
 
 dev_dependencies:
   flutter_test:

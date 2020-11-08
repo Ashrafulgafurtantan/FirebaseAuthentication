@@ -1,4 +1,4 @@
-import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/ui/home.dart';
 import 'package:firebase_auth_gorgeous_login/ui/login_page.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
@@ -11,22 +11,20 @@ class Wrapper extends StatefulWidget {
   _WrapperState createState() => _WrapperState();
 }
 class _WrapperState extends State<Wrapper> {
- // LocalUser localUser;
-
 
   @override
   Widget build(BuildContext context) {
 
-   final  localUser = Provider.of<LocalUser>(context);
+   final  appGuard = Provider.of<AppGuard>(context);
     print("In wrapper");
-    if(localUser!=null) {
-      print ( localUser.uid );
-      print ( localUser.isVerified );
+    if(appGuard!=null) {
+      print ( appGuard.uid );
+      print ( appGuard.isVerified );
     }
-    if(localUser==null ){
+    if(appGuard==null ){
       return LoginPage();
     }else{
-      return localUser.isVerified ? Home():LoginPage();
+      return appGuard.isVerified ? Home():LoginPage();
     }
   }
 }

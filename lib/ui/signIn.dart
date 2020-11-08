@@ -1,18 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_gorgeous_login/main.dart';
-import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/models/app_user.dart';
 import 'package:firebase_auth_gorgeous_login/style/shared.dart';
 import 'package:firebase_auth_gorgeous_login/style/theme.dart' as Theme;
+import 'package:firebase_auth_gorgeous_login/ui/dialougBox.dart';
 import 'package:firebase_auth_gorgeous_login/ui/flutter_toast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 final GoogleSignIn googleSignIn=GoogleSignIn();
 final userRef = FirebaseFirestore.instance.collection("users");
-GoogleSignInAccount userWhichIsSignedInInThisDevice;
+AppUser thisDeviceAppUser ;
+
 class SignIn extends StatefulWidget {
   final switcher;
   SignIn({this.switcher});
@@ -31,57 +32,56 @@ class _SignInState extends State<SignIn> {
   bool emailValid=true;
 
   void _toggleLogin() {
-    setState(() {
+    setState ( () {
       _obscureTextLogin = !_obscureTextLogin;
-    });
+    } );
   }
 
-
-  googleSignOutMethod()async{
-    googleSignIn.signOut();
-  }
-
-  createAccountInCloudFireStore()async{
-    print("createAccountInCloudFireStore = $userWhichIsSignedInInThisDevice");
-    await userRef.doc(userWhichIsSignedInInThisDevice.email).set({
-      "displayName": userWhichIsSignedInInThisDevice.displayName,
+  createAccountInCloudFireStoreUsingGoogleSignin(googleSignInAccount)async{
+    print("createAccountInCloudFireStore = $googleSignInAccount");
+    await userRef.doc(googleSignInAccount.email).set({
+      "displayName": googleSignInAccount.displayName,
       "emailVerified" : true,
-      'photoURL' : userWhichIsSignedInInThisDevice.photoUrl,
-      "username":userWhichIsSignedInInThisDevice.displayName,
+      'photoURL' : googleSignInAccount.photoUrl,
+      "username":googleSignInAccount.displayName,
     });
   }
-
   googleSignInMethod()async{
+try{
   GoogleSignInAccount googleSignInAccount= await  googleSignIn.signIn();
   if(googleSignInAccount!=null){
     GoogleSignInAuthentication googleSignInAuthentication= await   googleSignInAccount.authentication;
     AuthCredential credential = GoogleAuthProvider.credential(idToken:googleSignInAuthentication.idToken , accessToken: googleSignInAuthentication.accessToken);
-     final result = await authService.signInWithGoogle(credential);
-      if(result!=null){
-        userWhichIsSignedInInThisDevice  = googleSignIn.currentUser;
-        DocumentSnapshot doc =await userRef.doc(userWhichIsSignedInInThisDevice.email).get();
-        if(doc.exists){
-          print("u already have an account");
-          await userRef.doc(userWhichIsSignedInInThisDevice.email).update({
-            "displayName": userWhichIsSignedInInThisDevice.displayName,
-            "emailVerified" : true,
-            'photoURL' : userWhichIsSignedInInThisDevice.photoUrl,
-            "username":userWhichIsSignedInInThisDevice.displayName,
-          });
+    final result = await authService.signInWithGoogle(credential);
+    if(result!=null){
+      GoogleSignInAccount googleSignInAccount  = googleSignIn.currentUser;
+      DocumentSnapshot doc =await userRef.doc(googleSignInAccount.email).get();
+      if(doc.exists){
+        print("u already have an account");
+        await userRef.doc(googleSignInAccount.email).update({
+          "displayName": googleSignInAccount.displayName,
+          "emailVerified" : true,
+          'photoURL' : googleSignInAccount.photoUrl,
+          "username":googleSignInAccount.displayName,
+        });
 
-        }else{
-         await createAccountInCloudFireStore();
-        }
-
+      }else{
+        await createAccountInCloudFireStoreUsingGoogleSignin(googleSignInAccount);
       }
+      doc =await userRef.doc(googleSignInAccount.email).get();
+      thisDeviceAppUser =   AppUser.fromDocument(doc,doc.id);
+      print(thisDeviceAppUser.toString());
+    }
   }
-
+}catch(e){
+  print(e.toString());
+}
   }
-
   updateEmailVerificationValue(String email)async{
     await userRef.doc(email).update({
       'emailVerified':true,
     });
+
   }
 
   connectWithFirebaseAuthEmailPassword(String email,String password)async{
@@ -90,24 +90,20 @@ class _SignInState extends State<SignIn> {
       if(result==null){
         print("Email or passwor  e jhamela...");
         FloatToast().floatToast("Invalid email or password!!!");
-
       }else{
         if(result.emailVerified){
           print("Email verified");
-          updateEmailVerificationValue(email);
-          setState(() {
-            authService.localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
-            print(authService.localUser.uid);
-            print(authService.localUser.isVerified);
-          });
+         await updateEmailVerificationValue(email);
+          DocumentSnapshot doc = await userRef.doc(result.email).get();
+          thisDeviceAppUser = AppUser.fromDocument(doc,doc.id);
+          print(thisDeviceAppUser.toString());
+
         }else{
           print("email Not verified");
           FloatToast().floatToast("Please verify your email ");
         }
       }
   }
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -269,102 +265,7 @@ class _SignInState extends State<SignIn> {
                 onPressed: () {
                   showDialog(context: context,builder: (context){
                     TextEditingController resendEmailController=TextEditingController();
-                    return Dialog(
-                      elevation: 7.0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      insetAnimationCurve: Curves.bounceInOut,
-                      child: Stack(
-                        alignment: Alignment.topCenter,
-                        overflow: Overflow.visible,
-                        children: [
-                          Container(
-                              height: 250,
-                              width: 300,
-                              decoration: new BoxDecoration(
-                                borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                                gradient: Shared().getGradient(Theme.Colors.loginGradientEnd,Theme.Colors.loginGradientStart),),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  height: 80,
-                                  width: 230,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 15,bottom: 15,left: 15,right: 7),
-                                    child: TextField(
-
-                                      autofocus: false,
-                                      controller: resendEmailController,
-                                      keyboardType: TextInputType.emailAddress,
-                                      style: TextStyle(
-                                          fontFamily: "WorkSansSemiBold",
-                                          fontSize: 16.0,
-                                          color: Colors.black),
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        icon: Icon(
-                                          FontAwesomeIcons.envelope,
-                                          color: Colors.black,
-                                          size: 22.0,
-                                        ),
-                                        hintText: "Email Address",
-                                        hintStyle: TextStyle(
-                                            fontFamily: "WorkSansSemiBold", fontSize:17.0),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Positioned(bottom: 50,
-                            child: Container(
-                              alignment: Alignment.center,
-                              height: 55,
-                              width: 55,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: Shared().getGradient(Theme.Colors.loginGradientStart, Theme.Colors.loginGradientEnd,)
-                              ),
-                              child: IconButton(
-                                onPressed: ()async{
-                                  String email =resendEmailController.text;
-                                if(Shared().emailRegExp.hasMatch(email)){
-                                  await authService.resetPassword(email);
-                                  resendEmailController.clear();
-
-                                }else{
-                                  Navigator.pop(context);
-                                }
-                              },
-                                highlightColor: Colors.transparent,
-                                splashColor: Theme.Colors.loginGradientEnd,
-                                alignment: Alignment.center,
-                                icon: Icon(Icons.send,size: 37,color: Colors.white,),
-
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                              top:-50,
-                              child: CircleAvatar(
-                                backgroundColor: Colors.transparent,
-                            radius: 50,
-                            child: ClipRRect(
-
-                              borderRadius: BorderRadius.circular(50),
-                              child: Image.asset('assets/img/login_logo.png',fit: BoxFit.cover,),
-                            ),
-                          ))
-                        ],
-                      ),
-
-                    );
+                    return DialogWidget(resendEmailController: resendEmailController);
                   });
                 },
                 child: Text(
@@ -452,6 +353,7 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
+
 
 /*MaterialButton(
                           onPressed:(){} ,

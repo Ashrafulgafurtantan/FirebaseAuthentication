@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/style/shared.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
-  createAccountInCloudFireStore(result,String name)async{
+  createAccountInCloudFireStoreUsingEmailPasswordLogin(result,String name)async{
     print("createAccountInCloudFireStore = $result");
     await userRef.doc(result.email).set({
       "displayName": result.displayName,
@@ -53,6 +53,8 @@ class _SignUpState extends State<SignUp> {
       'photoURL' : result.photoURL,
       "username":name,
     });
+
+
   }
 
  Future<bool> connectWithFirebaseAuthEmailPassword(String email,String password,String name)async{
@@ -63,9 +65,8 @@ class _SignUpState extends State<SignUp> {
       return false;
     }else{
       print("In signup class ");
+        await  createAccountInCloudFireStoreUsingEmailPasswordLogin(result,name);
       FloatToast().floatToast("Account created.Email verification is necessary for Log in");
-      LocalUser localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
-        await  createAccountInCloudFireStore(result,name);
       return true;
     }
   }

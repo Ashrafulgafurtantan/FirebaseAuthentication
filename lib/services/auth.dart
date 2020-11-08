@@ -1,18 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
+import 'package:firebase_auth_gorgeous_login/ui/flutter_toast.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
   class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  LocalUser localUser;
   bool switcher=false;
-  Stream<LocalUser>get user{
-  
+  Stream<AppGuard>get user{
     return _auth.userChanges().map((User firebaseUser){
-       localUser =firebaseUser==null ?  null : LocalUser(uid: firebaseUser.uid,isVerified: firebaseUser.emailVerified);
+      AppGuard   appGuard =firebaseUser==null ?  null : AppGuard(uid: firebaseUser.uid,isVerified: firebaseUser.emailVerified);
       print("In streamBuilder");
        print(switcher);
-      return localUser;
+      return appGuard;
     });
   }
 
@@ -74,7 +74,14 @@ Future signInWithEmailAndPassword(String email,String password)async{
   resetPassword(String email)async{
     print("resetPassword");
     print(email);
-    await _auth.sendPasswordResetEmail(email:email );
+    try{
+      await _auth.sendPasswordResetEmail(email:email );
+    }catch(e){
+      print("error");
+      FloatToast().floatToast("Invalid E-mail/Never created any account!!!");
+      print(e.toString());
+    }
+    print("hello");
   }
 
 }
