@@ -248,15 +248,8 @@ class _SignUpState extends State<SignUp> {
                       blurRadius: 20.0,
                     ),
                   ],
-                  gradient: new LinearGradient(
-                      colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
-                      ],
-                      begin: const FractionalOffset(0.2, 0.2),
-                      end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
-                      tileMode: TileMode.clamp),
+                  gradient: Shared().getGradient(Theme.Colors.loginGradientEnd,Theme.Colors.loginGradientStart),
+
                 ),
                 child: MaterialButton(
                     highlightColor: Colors.transparent,

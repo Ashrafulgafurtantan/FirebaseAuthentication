@@ -268,7 +268,6 @@ class _SignInState extends State<SignIn> {
             child: FlatButton(
                 onPressed: () {
                   showDialog(context: context,builder: (context){
-
                     TextEditingController resendEmailController=TextEditingController();
                     return Dialog(
                       elevation: 7.0,
@@ -283,16 +282,7 @@ class _SignInState extends State<SignIn> {
                               width: 300,
                               decoration: new BoxDecoration(
                                 borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                                gradient: new LinearGradient(
-                                    colors: [
-                                      Theme.Colors.loginGradientEnd,
-                                      Theme.Colors.loginGradientStart
-                                    ],
-                                    begin: const FractionalOffset(0.2, 0.2),
-                                    end: const FractionalOffset(1.0, 1.0),
-                                    stops: [0.0, 1.0],
-                                    tileMode: TileMode.clamp),
-                              ),
+                                gradient: Shared().getGradient(Theme.Colors.loginGradientEnd,Theme.Colors.loginGradientStart),),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -339,16 +329,7 @@ class _SignInState extends State<SignIn> {
                               width: 55,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: new LinearGradient(
-                                    colors: [
-                                      Theme.Colors.loginGradientStart,
-                                      Theme.Colors.loginGradientEnd,
-
-                                    ],
-                                    begin: const FractionalOffset(0.2, 0.2),
-                                    end: const FractionalOffset(1.0, 1.0),
-                                    stops: [0.0, 1.0],
-                                    tileMode: TileMode.clamp),
+                                gradient: Shared().getGradient(Theme.Colors.loginGradientStart, Theme.Colors.loginGradientEnd,)
                               ),
                               child: IconButton(
                                 onPressed: ()async{
