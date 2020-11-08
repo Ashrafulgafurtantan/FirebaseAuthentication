@@ -165,17 +165,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       ),
     );
   }
-
-
-
-  /*
-
-
-  Here Is the Sign Up Part
-
-
-   */
-
   void _onExistingButtonPressed() {
 
     _pageController.animateToPage(0,

@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
-import 'package:firebase_auth_gorgeous_login/services/auth.dart';
+import 'package:firebase_auth_gorgeous_login/style/shared.dart';
+import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth_gorgeous_login/style/theme.dart' as Theme;
+import 'package:firebase_auth_gorgeous_login/ui/flutter_toast.dart';
 
 import '../main.dart';
 
@@ -41,30 +45,30 @@ class _SignUpState extends State<SignUp> {
     });
   }
 
-//  connectWuthFirebaseAuthSignInAnon()async{
-//    final result = await AuthService().signInAnonymus();//Result = Firebase User
-//    if(result==null){
-//      print("Error in 348 in logn_page_ui");
-//    }else{
-//      print("Anon signin");
-//      LocalUser localUser = LocalUser(uid: result.uid);
-//      print(localUser.uid);
-//    }
-//
-//  }
-
-  connectWithFirebaseAuthEmailPassword(String email,String password)async{
-    final result = await authService.signUpWithEmailAndPassword(email, password);//Result = Firebase User
-    if(result==null){
-      print("emal e jhamela ");
-    }else{
-      print("In signup class ");
-      LocalUser localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
-      print(localUser.uid);
-    }
+  createAccountInCloudFireStore(result,String name)async{
+    print("createAccountInCloudFireStore = $result");
+    await userRef.doc(result.email).set({
+      "displayName": result.displayName,
+      "emailVerified" : result.emailVerified,
+      'photoURL' : result.photoURL,
+      "username":name,
+    });
   }
 
-
+ Future<bool> connectWithFirebaseAuthEmailPassword(String email,String password,String name)async{
+    final result = await authService.signUpWithEmailAndPassword(email, password);//Result = Firebase User
+    if(result==null){
+      print("In signUp emal e jhamela.ALREADY USED ");
+      FloatToast().floatToast("This mail already had an account");
+      return false;
+    }else{
+      print("In signup class ");
+      FloatToast().floatToast("Account created.Email verification is necessary for Log in");
+      LocalUser localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
+        await  createAccountInCloudFireStore(result,name);
+      return true;
+    }
+  }
   @override
   void dispose() {
     // TODO: implement dispose
@@ -75,9 +79,6 @@ class _SignUpState extends State<SignUp> {
   }
   @override
   Widget build(BuildContext context) {
-
-
-
     return Container(
       padding: EdgeInsets.only(top: 23.0),
       child: Column(
@@ -272,26 +273,26 @@ class _SignUpState extends State<SignUp> {
                             fontFamily: "WorkSansBold"),
                       ),
                     ),
-                    onPressed: (){
+                    onPressed: ()async {
                       print("Hello signup");
-
                       setState(() {
                         nameValid=signupNameController.text.length>2;
-                        emailValid = RegExp( r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(signupEmailController.text);
-                       ;
+                        emailValid =Shared().emailRegExp.hasMatch(signupEmailController.text);
                       });
                       setState(() {
-
                         passwordValid = signupPasswordController.text.length>5 && signupPasswordController.text !=null;
                         confirmPasswordValid=signupConfirmPasswordController.text==signupPasswordController.text;
                       });
                       if(nameValid&& emailValid && passwordValid && confirmPasswordValid){
-
-
-                        connectWithFirebaseAuthEmailPassword(signupEmailController.text,signupPasswordController.text);
+                       bool clearCredencials = await connectWithFirebaseAuthEmailPassword(signupEmailController.text,signupPasswordController.text,signupNameController.text);
+                        if(clearCredencials){
+                          signupNameController.clear();
+                          signupEmailController.clear();
+                          signupPasswordController.clear();
+                          signupPasswordController.clear();
+                          signupConfirmPasswordController.clear();
+                        }
                       }
-
-
                     }),
               ),
             ],

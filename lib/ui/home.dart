@@ -1,4 +1,5 @@
-import 'package:firebase_auth_gorgeous_login/services/auth.dart';
+import 'package:firebase_auth_gorgeous_login/main.dart';
+import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
 import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
@@ -15,7 +16,8 @@ class _HomeState extends State<Home> {
           child: IconButton(
             icon: Icon(Icons.logout,size: 40,),
             onPressed: ()async{
-             await  AuthService().signOut();
+             await  authService.signOut();
+             googleSignIn.signOut();
             },
             color: Colors.pinkAccent,
           ),

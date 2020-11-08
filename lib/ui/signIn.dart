@@ -1,9 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_gorgeous_login/main.dart';
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/style/shared.dart';
 import 'package:firebase_auth_gorgeous_login/style/theme.dart' as Theme;
+import 'package:firebase_auth_gorgeous_login/ui/flutter_toast.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+final GoogleSignIn googleSignIn=GoogleSignIn();
+final userRef = FirebaseFirestore.instance.collection("users");
+GoogleSignInAccount userWhichIsSignedInInThisDevice;
 class SignIn extends StatefulWidget {
   final switcher;
   SignIn({this.switcher});
@@ -26,37 +35,78 @@ class _SignInState extends State<SignIn> {
       _obscureTextLogin = !_obscureTextLogin;
     });
   }
-//  connectWuthFirebaseAuthSignInAnon()async{
-//    final result = await AuthService().signInAnonymus();//Result = Firebase User
-//    if(result==null){
-//      print("Error in 348 in logn_page_ui");
-//    }else{
-//      print("Anon signin");
-//      LocalUser localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
-//      print(localUser.uid);
-//    }
-//
-//  }
+
+
+  googleSignOutMethod()async{
+    googleSignIn.signOut();
+  }
+
+  createAccountInCloudFireStore()async{
+    print("createAccountInCloudFireStore = $userWhichIsSignedInInThisDevice");
+    await userRef.doc(userWhichIsSignedInInThisDevice.email).set({
+      "displayName": userWhichIsSignedInInThisDevice.displayName,
+      "emailVerified" : true,
+      'photoURL' : userWhichIsSignedInInThisDevice.photoUrl,
+      "username":userWhichIsSignedInInThisDevice.displayName,
+    });
+  }
+
+  googleSignInMethod()async{
+  GoogleSignInAccount googleSignInAccount= await  googleSignIn.signIn();
+  if(googleSignInAccount!=null){
+    GoogleSignInAuthentication googleSignInAuthentication= await   googleSignInAccount.authentication;
+    AuthCredential credential = GoogleAuthProvider.credential(idToken:googleSignInAuthentication.idToken , accessToken: googleSignInAuthentication.accessToken);
+     final result = await authService.signInWithGoogle(credential);
+      if(result!=null){
+        userWhichIsSignedInInThisDevice  = googleSignIn.currentUser;
+        DocumentSnapshot doc =await userRef.doc(userWhichIsSignedInInThisDevice.email).get();
+        if(doc.exists){
+          print("u already have an account");
+          await userRef.doc(userWhichIsSignedInInThisDevice.email).update({
+            "displayName": userWhichIsSignedInInThisDevice.displayName,
+            "emailVerified" : true,
+            'photoURL' : userWhichIsSignedInInThisDevice.photoUrl,
+            "username":userWhichIsSignedInInThisDevice.displayName,
+          });
+
+        }else{
+         await createAccountInCloudFireStore();
+        }
+
+      }
+  }
+
+  }
+
+  updateEmailVerificationValue(String email)async{
+    await userRef.doc(email).update({
+      'emailVerified':true,
+    });
+  }
 
   connectWithFirebaseAuthEmailPassword(String email,String password)async{
     final result = await authService.signInWithEmailAndPassword(email, password);//Result = Firebase User
         print("in SignIn");
       if(result==null){
         print("Email or passwor  e jhamela...");
+        FloatToast().floatToast("Invalid email or password!!!");
+
       }else{
         if(result.emailVerified){
           print("Email verified");
-
+          updateEmailVerificationValue(email);
           setState(() {
             authService.localUser = LocalUser(uid: result.uid,isVerified: result.emailVerified);
             print(authService.localUser.uid);
             print(authService.localUser.isVerified);
           });
         }else{
-          print("Not verified");
+          print("email Not verified");
+          FloatToast().floatToast("Please verify your email ");
         }
       }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +244,7 @@ class _SignInState extends State<SignIn> {
                       print(loginEmailController.text);
                       print(loginPasswordController.text);
                       setState(() {
-                        emailValid = RegExp( r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$').hasMatch(loginEmailController.text);
+                        emailValid = Shared().emailRegExp.hasMatch(loginEmailController.text);
 
                       });
                       setState(() {
@@ -216,7 +266,126 @@ class _SignInState extends State<SignIn> {
           Padding(
             padding: EdgeInsets.only(top: 10.0),
             child: FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  showDialog(context: context,builder: (context){
+
+                    TextEditingController resendEmailController=TextEditingController();
+                    return Dialog(
+                      elevation: 7.0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      insetAnimationCurve: Curves.bounceInOut,
+                      child: Stack(
+                        alignment: Alignment.topCenter,
+                        overflow: Overflow.visible,
+                        children: [
+                          Container(
+                              height: 250,
+                              width: 300,
+                              decoration: new BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                                gradient: new LinearGradient(
+                                    colors: [
+                                      Theme.Colors.loginGradientEnd,
+                                      Theme.Colors.loginGradientStart
+                                    ],
+                                    begin: const FractionalOffset(0.2, 0.2),
+                                    end: const FractionalOffset(1.0, 1.0),
+                                    stops: [0.0, 1.0],
+                                    tileMode: TileMode.clamp),
+                              ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: 80,
+                                  width: 230,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 15,bottom: 15,left: 15,right: 7),
+                                    child: TextField(
+
+                                      autofocus: false,
+                                      controller: resendEmailController,
+                                      keyboardType: TextInputType.emailAddress,
+                                      style: TextStyle(
+                                          fontFamily: "WorkSansSemiBold",
+                                          fontSize: 16.0,
+                                          color: Colors.black),
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        icon: Icon(
+                                          FontAwesomeIcons.envelope,
+                                          color: Colors.black,
+                                          size: 22.0,
+                                        ),
+                                        hintText: "Email Address",
+                                        hintStyle: TextStyle(
+                                            fontFamily: "WorkSansSemiBold", fontSize:17.0),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(bottom: 50,
+                            child: Container(
+                              alignment: Alignment.center,
+                              height: 55,
+                              width: 55,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: new LinearGradient(
+                                    colors: [
+                                      Theme.Colors.loginGradientStart,
+                                      Theme.Colors.loginGradientEnd,
+
+                                    ],
+                                    begin: const FractionalOffset(0.2, 0.2),
+                                    end: const FractionalOffset(1.0, 1.0),
+                                    stops: [0.0, 1.0],
+                                    tileMode: TileMode.clamp),
+                              ),
+                              child: IconButton(
+                                onPressed: ()async{
+                                  String email =resendEmailController.text;
+                                if(Shared().emailRegExp.hasMatch(email)){
+                                  await authService.resetPassword(email);
+                                  resendEmailController.clear();
+
+                                }else{
+                                  Navigator.pop(context);
+                                }
+                              },
+                                highlightColor: Colors.transparent,
+                                splashColor: Theme.Colors.loginGradientEnd,
+                                alignment: Alignment.center,
+                                icon: Icon(Icons.send,size: 37,color: Colors.white,),
+
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                              top:-50,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.transparent,
+                            radius: 50,
+                            child: ClipRRect(
+
+                              borderRadius: BorderRadius.circular(50),
+                              child: Image.asset('assets/img/login_logo.png',fit: BoxFit.cover,),
+                            ),
+                          ))
+                        ],
+                      ),
+
+                    );
+                  });
+                },
                 child: Text(
                   "Forgot Password?",
                   style: TextStyle(
@@ -277,27 +446,11 @@ class _SignInState extends State<SignIn> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 10.0, right: 40.0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: new BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: new Icon(
-                      FontAwesomeIcons.facebookF,
-                      color: Color(0xFF0084ff),
-                    ),
-                  ),
-                ),
-              ),
+
               Padding(
                 padding: EdgeInsets.only(top: 10.0),
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: googleSignInMethod,
                   child: Container(
                     padding: const EdgeInsets.all(15.0),
                     decoration: new BoxDecoration(
@@ -319,3 +472,20 @@ class _SignInState extends State<SignIn> {
   }
 }
 
+/*MaterialButton(
+                          onPressed:(){} ,
+                          highlightColor: Colors.transparent,
+                          splashColor: Theme.Colors.loginGradientEnd,
+                          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 42.0),
+                            child: Text(
+                              "LOGIN",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 25.0,
+                                  fontFamily: "WorkSansBold"),
+                            ),
+                          ),
+                        ),*/

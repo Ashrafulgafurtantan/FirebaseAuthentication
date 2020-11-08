@@ -1,7 +1,5 @@
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
-import 'package:firebase_auth_gorgeous_login/models/switcher.dart';
 import 'package:firebase_auth_gorgeous_login/services/auth.dart';
-import 'package:firebase_auth_gorgeous_login/ui/login_page.dart';
 import 'package:firebase_auth_gorgeous_login/ui/wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';

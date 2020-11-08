@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
+import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
+import 'package:google_sign_in/google_sign_in.dart';
   class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   LocalUser localUser;
@@ -34,28 +36,20 @@ import 'package:firebase_auth_gorgeous_login/models/local_user.dart';
       print(e.toString());
     }
   }
+
+  Future  signInWithGoogle(credentials)async{
+   final result = await _auth.signInWithCredential(credentials);
+   print("signInWithGoogle");
+   print("CurrentUser=${googleSignIn.currentUser}");
+   return result;
+
+  }
+
 Future signInWithEmailAndPassword(String email,String password)async{
     try{
       final result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User user = result.user;
-      print("In auth signin Method");
-//     _auth.currentUser..reload();
-//      user = _auth.currentUser;
-   //   Stream<User> uuu = await _auth.userChanges();
-   //   print(user.emailVerified);
-
-
-
-//      if(user.emailVerified){
-//        print("yes verified");
-//        return user;
-//      }else{
-//        print("Not verified");
-//        return null;
-//      }
-
       return user;
-
     }catch(e){
       print(e.toString());
       return null;
@@ -68,40 +62,19 @@ Future signInWithEmailAndPassword(String email,String password)async{
       print("In auth signUp function ");
       User user = result.user;
       await user.sendEmailVerification();
+
       return user;
-
-
     }catch(e){
       print(e.toString());
       return null;
     }
-
-
-
-
-
-
-
-//    try{
-//      final result = await _auth.createUserWithEmailAndPassword(email: email, password: pass);
-//
-//      print("in auth");
-//      print(result);
-//      if(result==null){
-//        print("Invalid email from firebase");
-//      }
-//      User user = result.user;//Firebase User
-//      print("in auth");
-//      print(user);
-//      return user;
-//
-//    }catch(e){
-//      print(e.toString());
-//      return null;
-//    }
-
-
   }
 
+
+  resetPassword(String email)async{
+    print("resetPassword");
+    print(email);
+    await _auth.sendPasswordResetEmail(email:email );
+  }
 
 }
