@@ -1,5 +1,5 @@
 class AppGuard{
-  final String uid;
+  final String uid,email;
    bool isVerified;
-  AppGuard({this.uid,this.isVerified});
+  AppGuard({this.uid,this.isVerified,this.email});
 }

@@ -9,7 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
   bool switcher=false;
   Stream<AppGuard>get user{
     return _auth.userChanges().map((User firebaseUser){
-      AppGuard   appGuard =firebaseUser==null ?  null : AppGuard(uid: firebaseUser.uid,isVerified: firebaseUser.emailVerified);
+      AppGuard   appGuard =firebaseUser==null ?  null : AppGuard(uid: firebaseUser.uid,isVerified: firebaseUser.emailVerified,email: firebaseUser.email);
       print("In streamBuilder");
        print(switcher);
       return appGuard;

@@ -18,13 +18,13 @@ class _WrapperState extends State<Wrapper> {
    final  appGuard = Provider.of<AppGuard>(context);
     print("In wrapper");
     if(appGuard!=null) {
-      print ( appGuard.uid );
+      print ( appGuard.email );
       print ( appGuard.isVerified );
     }
     if(appGuard==null ){
       return LoginPage();
     }else{
-      return appGuard.isVerified ? Home():LoginPage();
+      return appGuard.isVerified ? Home(appGuard: appGuard,):LoginPage();
     }
   }
 }

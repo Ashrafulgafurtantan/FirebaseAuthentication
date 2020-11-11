@@ -15,8 +15,7 @@ final userRef = FirebaseFirestore.instance.collection("users");
 AppUser thisDeviceAppUser ;
 
 class SignIn extends StatefulWidget {
-  final switcher;
-  SignIn({this.switcher});
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -68,9 +67,6 @@ try{
       }else{
         await createAccountInCloudFireStoreUsingGoogleSignin(googleSignInAccount);
       }
-      doc =await userRef.doc(googleSignInAccount.email).get();
-      thisDeviceAppUser =   AppUser.fromDocument(doc,doc.id);
-      print(thisDeviceAppUser.toString());
     }
   }
 }catch(e){
@@ -94,9 +90,9 @@ try{
         if(result.emailVerified){
           print("Email verified");
          await updateEmailVerificationValue(email);
-          DocumentSnapshot doc = await userRef.doc(result.email).get();
-          thisDeviceAppUser = AppUser.fromDocument(doc,doc.id);
-          print(thisDeviceAppUser.toString());
+          DocumentSnapshot doc = await userRef.doc(result.email).get();//..........
+          thisDeviceAppUser = AppUser.fromDocument(doc,doc.id);//.......
+
 
         }else{
           print("email Not verified");

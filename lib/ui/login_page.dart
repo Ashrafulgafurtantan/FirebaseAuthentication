@@ -7,8 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
-  var switcher;
-  LoginPage({this.switcher});
 
   @override
   _LoginPageState createState() => new _LoginPageState();
@@ -82,7 +80,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         children: <Widget>[
                           new ConstrainedBox(
                             constraints: const BoxConstraints.expand(),
-                            child: SignIn(switcher: widget.switcher,),
+                            child: SignIn(),
                           ),
                           new ConstrainedBox(
                             constraints: const BoxConstraints.expand(),
