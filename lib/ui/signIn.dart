@@ -43,6 +43,7 @@ class _SignInState extends State<SignIn> {
       "emailVerified" : true,
       'photoURL' : googleSignInAccount.photoUrl,
       "username":googleSignInAccount.displayName,
+      'email': googleSignInAccount.email,
     });
   }
   googleSignInMethod()async{
@@ -62,6 +63,7 @@ try{
           "emailVerified" : true,
           'photoURL' : googleSignInAccount.photoUrl,
           "username":googleSignInAccount.displayName,
+          "email" : googleSignInAccount.email,
         });
 
       }else{

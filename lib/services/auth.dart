@@ -56,7 +56,7 @@ Future signInWithEmailAndPassword(String email,String password)async{
     }
 }
   Future signUpWithEmailAndPassword(String email,String pass)async{
-
+print("email =$email in Auth");
     try{
       final result = await _auth.createUserWithEmailAndPassword(email: email, password: pass);
       print("In auth signUp function ");
@@ -66,11 +66,10 @@ Future signInWithEmailAndPassword(String email,String password)async{
       return user;
     }catch(e){
       print(e.toString());
+      print("hello auth signUp");
       return null;
     }
   }
-
-
   resetPassword(String email)async{
     print("resetPassword");
     print(email);

@@ -9,6 +9,8 @@ import 'package:firebase_auth_gorgeous_login/widgets/search.dart';
 import 'package:firebase_auth_gorgeous_login/widgets/timeline.dart';
 import 'package:firebase_auth_gorgeous_login/widgets/create_question.dart';
 import 'package:flutter/material.dart';
+final followerRef = FirebaseFirestore.instance.collection("followers");
+final followingRef = FirebaseFirestore.instance.collection("followings");
 
 
 class Home extends StatefulWidget {
@@ -27,7 +29,7 @@ class _HomeState extends State<Home> {
 
   getCurrentUser()async{
    DocumentSnapshot doc =await userRef.doc(widget.appGuard.email).get();//.....
-    thisDeviceAppUser =   AppUser.fromDocument(doc,doc.id);//...
+    thisDeviceAppUser = AppUser.fromDocument(doc,doc.id);//...
     print("thisDeviceAppUser = $thisDeviceAppUser");
   }
   @override
@@ -58,7 +60,7 @@ class _HomeState extends State<Home> {
             Activity(),
             CreateQuestion(currentUser: thisDeviceAppUser,),
             Search(),
-            Profile(),
+            Profile(thisDeviceAppUser),
           ],
         ),
       ),

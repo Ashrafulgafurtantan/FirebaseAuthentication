@@ -15,8 +15,7 @@ class _ActivityState extends State<Activity> {
           color: Colors.pink,
           child: Text("SignOut"),
           onPressed: (){
-              googleSignIn.signOut();
-              authService.signOut();
+
           },
         )),
       ),

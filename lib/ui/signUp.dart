@@ -52,12 +52,14 @@ class _SignUpState extends State<SignUp> {
       "emailVerified" : result.emailVerified,
       'photoURL' : result.photoURL,
       "username":name,
+      'email' : result.email,
     });
 
 
   }
 
  Future<bool> connectWithFirebaseAuthEmailPassword(String email,String password,String name)async{
+    print("email =$email, name= $name");
     final result = await authService.signUpWithEmailAndPassword(email, password);//Result = Firebase User
     if(result==null){
       print("In signUp emal e jhamela.ALREADY USED ");

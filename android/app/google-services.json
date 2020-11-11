@@ -8,7 +8,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:234547494319:android:acdf7eefd631a3ae82835a",
+        "mobilesdk_app_id": "1:234547494319:android:242d07561772792d82835a",
         "android_client_info": {
           "package_name": "ashraful.gafur.firebase_auth_gorgeous_login"
         }
@@ -38,6 +38,13 @@
             {
               "client_id": "234547494319-hfq79tdgjpa7c5rfvqekej1hqcrvsvgj.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "234547494319-cudsd0r8vpq9egp9401dv7i8vsktnh04.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "ashraful.gafur.firebaseAuthGorgeousLogin"
+              }
             }
           ]
         }

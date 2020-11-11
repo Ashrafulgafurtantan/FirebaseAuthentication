@@ -1,18 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth_gorgeous_login/models/app_user.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
-import 'package:firebase_auth_gorgeous_login/widgets/profile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:storage_path/storage_path.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 final storage = FirebaseStorage.instance;
 final postRef = FirebaseFirestore.instance.collection("posts");
@@ -24,9 +20,7 @@ class CreateQuestion extends StatefulWidget {
   _CreateQuestionState createState() => _CreateQuestionState();
 }
 
-class _CreateQuestionState extends State<CreateQuestion>
-
-    with AutomaticKeepAliveClientMixin<CreateQuestion>{
+class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAliveClientMixin<CreateQuestion>{
   TextEditingController captionController;
   TextEditingController locationController;
   File file;
@@ -65,12 +59,10 @@ class _CreateQuestionState extends State<CreateQuestion>
         ),
       ),
     ),);
-
   }
 
   uploadImgInFirestore(String mediaUrl,String description,String location){
     postRef.doc(thisDeviceAppUser.email).collection('userPosts').doc(postId).set({
-
       'postId':postId,
       'ownerMail':thisDeviceAppUser.email,
       'username': thisDeviceAppUser.username,
@@ -86,7 +78,7 @@ class _CreateQuestionState extends State<CreateQuestion>
 
     UploadTask task = FirebaseStorage.instance.ref('post_$postId.jpg').putFile(file);task.snapshotEvents.listen((TaskSnapshot snapshot) {
       print('Snapshot state: ${snapshot.state}'); // paused, running, complete
-      print('Progress: ${ snapshot.bytesTransferred}/snapshot.totalBytes ');
+      print('Progress: ${ (snapshot.bytesTransferred.toDouble()/snapshot.totalBytes.toDouble())*100.00} ');
 
     }, onError: (Object e) {
       print(e); // FirebaseException
@@ -94,8 +86,14 @@ class _CreateQuestionState extends State<CreateQuestion>
     task.whenComplete(() async{
       String downloadURL = await storage.ref('post_$postId.jpg').getDownloadURL();
       print(downloadURL);
-      await uploadImgInFirestore(downloadURL,captionController.text,locationController.text);
+      String cap=captionController.text,location = locationController.text;
+      await uploadImgInFirestore(downloadURL,cap,location);
+      setState(() {
+        locationController.clear();
+        captionController.clear();
+        file=null;
 
+      });
     });
     task.then((TaskSnapshot snapshot) async{
       print('Upload complete!');
@@ -108,11 +106,9 @@ class _CreateQuestionState extends State<CreateQuestion>
 
 
   getImagesPath() async {
-    //  await grantPermission();
+
     List<GridTile>tiles=[addDefaultTiles("Camera",fromCameraHandle),addDefaultTiles("Gallery",fromGalleryHandle)];
     String imagespath = "";
-    List<Widget> cList=new List() ;
-
     try {
       imagespath = await StoragePath.imagesPath;
       var response = jsonDecode(imagespath);
@@ -170,12 +166,6 @@ class _CreateQuestionState extends State<CreateQuestion>
 
   uploadButtonPressed()async{
     await uploadImage(file);
-    setState(() {
-      locationController.clear();
-      captionController.clear();
-      file=null;
-
-    });
   }
 
   @override
