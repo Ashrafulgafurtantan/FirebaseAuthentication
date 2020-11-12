@@ -48,7 +48,7 @@ class _SignUpState extends State<SignUp> {
   createAccountInCloudFireStoreUsingEmailPasswordLogin(result,String name)async{
     print("createAccountInCloudFireStore = $result");
     await userRef.doc(result.email).set({
-      "displayName": result.displayName,
+      "displayName": name,
       "emailVerified" : result.emailVerified,
       'photoURL' : result.photoURL,
       "username":name,
