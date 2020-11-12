@@ -1,9 +1,7 @@
 import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/ui/home.dart';
 import 'package:firebase_auth_gorgeous_login/ui/login_page.dart';
-import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class Wrapper extends StatefulWidget {
@@ -16,11 +14,6 @@ class _WrapperState extends State<Wrapper> {
   Widget build(BuildContext context) {
 
    final  appGuard = Provider.of<AppGuard>(context);
-    print("In wrapper");
-    if(appGuard!=null) {
-      print ( appGuard.email );
-      print ( appGuard.isVerified );
-    }
     if(appGuard==null ){
       return LoginPage();
     }else{

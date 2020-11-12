@@ -3,11 +3,9 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/models/app_user.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
-import 'package:firebase_auth_gorgeous_login/widgets/activity.dart';
 import 'package:firebase_auth_gorgeous_login/widgets/profile.dart';
 import 'package:firebase_auth_gorgeous_login/widgets/search.dart';
-import 'package:firebase_auth_gorgeous_login/widgets/timeline.dart';
-import 'package:firebase_auth_gorgeous_login/widgets/create_question.dart';
+import 'package:firebase_auth_gorgeous_login/widgets/upload.dart';
 import 'package:flutter/material.dart';
 final followerRef = FirebaseFirestore.instance.collection("followers");
 final followingRef = FirebaseFirestore.instance.collection("followings");
@@ -56,11 +54,11 @@ class _HomeState extends State<Home> {
             setState(() => _currentIndex = index);
           },
           children: <Widget>[
-            Timeline(),
-            Activity(),
-            CreateQuestion(currentUser: thisDeviceAppUser,),
             Search(),
-            Profile(thisDeviceAppUser),
+            Upload(currentUser: thisDeviceAppUser,),
+            Profile(),
+
+
           ],
         ),
       ),
@@ -76,11 +74,10 @@ class _HomeState extends State<Home> {
 
         items: <Widget>[
 
-          Icon(Icons.whatshot,size: 30,color: Colors.white,),
-          Icon(Icons.notifications_active,size: 30,color: Colors.white ),
-          Icon(Icons.photo_camera,size: 40,color: Colors.white),
           Icon(Icons.search,size: 30,color: Colors.white),
+          Icon(Icons.photo_camera,size: 40,color: Colors.white),
           Icon(Icons.account_circle,size: 30,color: Colors.white ),
+
         ],
       ),
     );

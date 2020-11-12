@@ -13,14 +13,14 @@ import 'package:uuid/uuid.dart';
 final storage = FirebaseStorage.instance;
 final postRef = FirebaseFirestore.instance.collection("posts");
 
-class CreateQuestion extends StatefulWidget {
+class Upload extends StatefulWidget {
   final AppUser currentUser;
-  CreateQuestion({this.currentUser});
+  Upload({this.currentUser});
   @override
-  _CreateQuestionState createState() => _CreateQuestionState();
+  _UploadState createState() => _UploadState();
 }
 
-class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAliveClientMixin<CreateQuestion>{
+class _UploadState extends State<Upload> with AutomaticKeepAliveClientMixin<Upload>{
   TextEditingController captionController;
   TextEditingController locationController;
   File file;
@@ -32,7 +32,7 @@ class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAlive
   fromGalleryHandle()async{
     File f=await ImagePicker.pickImage(source: ImageSource.gallery, maxWidth: 960,maxHeight: 675);
     if(f!=null)
-      print('file not null');
+
     setState(() {
       file=f;
     });
@@ -40,7 +40,7 @@ class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAlive
   fromCameraHandle()async{
     File f=await ImagePicker.pickImage(source: ImageSource.camera, maxWidth: 960,maxHeight: 675);
     if(f!=null)
-      print('file not null');
+
     setState(() {
       file=f;
     });
@@ -117,12 +117,12 @@ class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAlive
       List<FileModel> list = imageList.map<FileModel>((json) => FileModel.fromJson(json)).toList();
 
       list.forEach((element)async {
-        print(element.toString());
-        if(element.folder =='High Quality Image'){
+      //  print(element.toString());
+        if(element.folder =='Camera'){
 
           for(int i=0;i<element.files.length && i<10;i++){
             FileImage image=new FileImage(new File(element.files[i]));
-            print(image);
+           // print(image);
             if(image != null){
               tiles.add(GridTile(child: Padding(
                 padding: const EdgeInsets.all(2.0),
@@ -136,11 +136,9 @@ class _CreateQuestionState extends State<CreateQuestion> with AutomaticKeepAlive
                   },
                 ),
               ),));
-              print(tiles.length);
+            //  print(tiles.length);
             }
-            else{
-              print('no image');
-            }
+
           }
           setState(() {
             gridTiles = tiles;

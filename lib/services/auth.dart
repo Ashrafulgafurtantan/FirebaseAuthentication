@@ -2,16 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_gorgeous_login/models/app_gaurd.dart';
 import 'package:firebase_auth_gorgeous_login/ui/flutter_toast.dart';
 import 'package:firebase_auth_gorgeous_login/ui/signIn.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+
   class AuthService{
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool switcher=false;
   Stream<AppGuard>get user{
     return _auth.userChanges().map((User firebaseUser){
       AppGuard   appGuard =firebaseUser==null ?  null : AppGuard(uid: firebaseUser.uid,isVerified: firebaseUser.emailVerified,email: firebaseUser.email);
-      print("In streamBuilder");
-       print(switcher);
+
       return appGuard;
     });
   }
